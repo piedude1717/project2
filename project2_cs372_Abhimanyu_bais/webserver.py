@@ -1,36 +1,35 @@
 import socket
 
-addr = ('localhost', 7777)
 
-
-s = socket.socket()
-s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+addr = ('127.0.0.1', 7777)
 s.bind(addr)
-s.listen()
+s.listen(5)
 
 print("Server Listening on: " + str(addr[0]) + " at port: " + str(addr[1]))
 
-client, addr = s.accept()
-print("Accepted connection from: " + str(addr))
-
 
 while True:
+    client, addr = s.accept()
+    print("Accepted connection from: " + str(addr))
     print("Waiting for client to send message...")
-    response = client.recv(4500).decode()
-    print(response)
+    response = client.recv(4500).decode('utf-8')
 
-    if str(response) == "/q":
+    if response == "/q":
         client.close()
         s.close()
+        sock.close()
         break
 
-    if str(response) == "www.eample.com":
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.connect((response, 80))
-        sock.send(b"GET / HTTP/1.1\r\nHost:www.example.com\r\n\r\n")
-        response = sock.recv(4096)
-        client.send(response)
-        sock.close()
-
+    print(response)
+    x = response
+    y = 4600
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect((f"{response}", 80))
+    sock.sendall(bytes(f"GET / HTTP/1.1\r\nHost:{response}\r\n\r\n", "utf-8"))
+    info = sock.recv(4500)
+    client.sendall(info)
+    client.close()
+    sock.close()
 
 print("Connection closed")
